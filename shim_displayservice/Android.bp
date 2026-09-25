@@ -1,0 +1,25 @@
+cc_library_shared {
+    // Module name must NOT contain @version (soong drops @-named cc libs
+    // whose hidl_interface was deleted); stem keeps the exact filename
+    // the prebuilt blob DT_NEEDEDs.
+    name: "libshim_displayservice",
+    stem: "android.frameworks.displayservice@1.0",
+    owner: "xiaomi",
+    vendor: true,
+    visibility: ["//visibility:public"],
+    srcs: [
+        "displayservice_shim.cpp",
+    ],
+    local_include_dirs: ["include"],
+    shared_libs: [
+        "libhidlbase",
+        "libutils",
+        "libcutils",
+        "liblog",
+        "libc++",
+    ],
+    cflags: [
+        "-Wall",
+        "-Werror",
+    ],
+}

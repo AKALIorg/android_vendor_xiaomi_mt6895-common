@@ -2148,7 +2148,6 @@ cc_prebuilt_library_shared {
                 "proprietary/vendor/lib64/libcodec2_mtk_vdec.so",
             ],
             shared_libs: [
-                "libformatter",
                 "libdpframework",
                 "android.hardware.graphics.bufferqueue@2.0",
                 "libui",
@@ -2199,7 +2198,6 @@ cc_prebuilt_library_shared {
                 "proprietary/vendor/lib64/libcodec2_mtk_venc.so",
             ],
             shared_libs: [
-                "libformatter",
                 "libdpframework",
                 "android.hardware.graphics.bufferqueue@2.0",
                 "libui",
@@ -6083,7 +6081,11 @@ cc_prebuilt_library_shared {
 }
 
 cc_prebuilt_library_shared {
-    name: "libmnl",
+    // MTK proprietary GPS/MNL library - NOT upstream netlink libmnl.
+    // Renamed to avoid clash with system libmnl (vendor_available in A17);
+    // mnld binary patchelfed to DT_NEEDED libmnl_mtk.so (see commit msg).
+    name: "libmnl_mtk",
+    stem: "libmnl_mtk",
     owner: "xiaomi",
     strip: {
         none: true,
@@ -8343,6 +8345,9 @@ cc_prebuilt_library_shared {
     strip: {
         none: true,
     },
+    // Uses AudioSystem::get/setParameters removed in A17; only EngineerMode
+    // audio tests call it - allow build, system audio (HAL/Dolby/Viper) unaffected.
+    allow_undefined_symbols: true,
     target: {
         android_arm64: {
             srcs: [
@@ -8457,6 +8462,9 @@ cc_prebuilt_library_shared {
     strip: {
         none: true,
     },
+    // Calls AudioSystem::get/setParameters removed in A17; EngineerMode
+    // audio tests only - same allowance as libaudiotoolkit below.
+    allow_undefined_symbols: true,
     target: {
         android_arm64: {
             srcs: [
@@ -10116,6 +10124,8 @@ dex_import {
     ],
 }
 
+// Must stay dex_import (not make prebuilt): PRODUCT_BOOT_JARS entries must
+// be soong modules. These two verify cleanly (unlike telephony-common).
 dex_import {
     name: "mediatek-ims-base",
     owner: "xiaomi",
@@ -10130,39 +10140,6 @@ dex_import {
     jars: [
         "proprietary/system/framework/mediatek-ims-common.jar",
     ],
-}
-
-dex_import {
-    name: "mediatek-telecom-common",
-    owner: "xiaomi",
-    jars: [
-        "proprietary/system/framework/mediatek-telecom-common.jar",
-    ],
-}
-
-dex_import {
-    name: "mediatek-telephony-base",
-    owner: "xiaomi",
-    jars: [
-        "proprietary/system/framework/mediatek-telephony-base.jar",
-    ],
-}
-
-dex_import {
-    name: "mediatek-telephony-common",
-    owner: "xiaomi",
-    jars: [
-        "proprietary/system/framework/mediatek-telephony-common.jar",
-    ],
-}
-
-dex_import {
-    name: "mediatek-ims-extension-plugin",
-    owner: "xiaomi",
-    jars: [
-        "proprietary/system_ext/framework/mediatek-ims-extension-plugin.jar",
-    ],
-    system_ext_specific: true,
 }
 
 prebuilt_etc_xml {
@@ -11077,7 +11054,7 @@ cc_prebuilt_binary {
                 "proprietary/vendor/bin/mnld",
             ],
             shared_libs: [
-                "libmnl",
+                "libmnl_mtk",
                 "libcurl",
                 "libcutils",
                 "libnvram",
@@ -11370,10 +11347,10 @@ install_symlink {
 }
 
 install_symlink {
-    name: "vendor_lib64_libmnl_so",
+    name: "vendor_lib64_libmnl_mtk_so",
     soc_specific: true,
-    installed_location: "lib64/libmnl.so",
-    symlink_target: "/vendor/lib64/mt6895/libmnl.so",
+    installed_location: "lib64/libmnl_mtk.so",
+    symlink_target: "/vendor/lib64/mt6895/libmnl_mtk.so",
 }
 
 install_symlink {

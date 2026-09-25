@@ -7,7 +7,6 @@ PRODUCT_SOONG_NAMESPACES += \
 
 PRODUCT_COPY_FILES += \
     vendor/xiaomi/mt6895-common/proprietary/system/etc/public.libraries-mtk.txt:$(TARGET_COPY_OUT_SYSTEM)/etc/public.libraries-mtk.txt \
-    vendor/xiaomi/mt6895-common/proprietary/system_ext/etc/init/init.vtservice.rc:$(TARGET_COPY_OUT_SYSTEM_EXT)/etc/init/init.vtservice.rc \
     vendor/xiaomi/mt6895-common/proprietary/vendor/etc/audio_param/AudioParamOptions_mgvi.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio_param/AudioParamOptions_mgvi.xml \
     vendor/xiaomi/mt6895-common/proprietary/vendor/etc/audio_param/BtInfo_AudioParam.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio_param/BtInfo_AudioParam.xml \
     vendor/xiaomi/mt6895-common/proprietary/vendor/etc/audio_param/BtInfo_ParamUnitDesc.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio_param/BtInfo_ParamUnitDesc.xml \
@@ -136,7 +135,6 @@ PRODUCT_COPY_FILES += \
     vendor/xiaomi/mt6895-common/proprietary/vendor/etc/init/init.gps_drv.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.gps_drv.rc \
     vendor/xiaomi/mt6895-common/proprietary/vendor/etc/init/init.gps_pwr.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.gps_pwr.rc \
     vendor/xiaomi/mt6895-common/proprietary/vendor/etc/init/init.gps_scp.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.gps_scp.rc \
-    vendor/xiaomi/mt6895-common/proprietary/vendor/etc/init/init.vtservice_aidl.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.vtservice_aidl.rc \
     vendor/xiaomi/mt6895-common/proprietary/vendor/etc/init/init.wlan_drv.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.wlan_drv.rc \
     vendor/xiaomi/mt6895-common/proprietary/vendor/etc/init/microtrust.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/microtrust.rc \
     vendor/xiaomi/mt6895-common/proprietary/vendor/etc/init/mtk_agpsd_p.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/mtk_agpsd_p.rc \
@@ -381,7 +379,7 @@ PRODUCT_PACKAGES += \
     libaiselector \
     libdpframework \
     libgamehdr \
-    libmnl \
+    libmnl_mtk \
     libmtk_drvb \
     libneuralnetworks_sl_driver_mtk_prebuilt \
     libneuron_adapter_mgvi \
@@ -493,7 +491,6 @@ PRODUCT_PACKAGES += \
     libneuronusdk_adapter.mtk \
     libnir_neon_driver_ndk.mtk \
     libsignal \
-    libsink-mtk \
     libsource \
     libtflite_mtk.mtk \
     libvcodec_cap \
@@ -558,14 +555,12 @@ PRODUCT_PACKAGES += \
     vendor.microtrust.hardware.se@1.0-service \
     vendor.microtrust.hardware.soter@1.0-service \
     vendor.microtrust.hardware.thh@2.0-service \
-    vtservice_aidl \
     mlipayd_isee@1.1 \
     mnld \
     mtd_isee@1.3 \
     mtk_agpsd \
     nvram_daemon \
     teei_daemon \
-    vtservice
 
 PRODUCT_PACKAGES += \
     vendor_bin_hw_android_hardware_graphics_allocator@4_0-service-mediatek \
@@ -583,7 +578,7 @@ PRODUCT_PACKAGES += \
     vendor_lib64_libaiselector_so \
     vendor_lib64_libdpframework_so \
     vendor_lib64_libgamehdr_so \
-    vendor_lib64_libmnl_so \
+    vendor_lib64_libmnl_mtk_so \
     vendor_lib64_libmtk_drvb_so \
     vendor_lib64_libneuralnetworks_sl_driver_mtk_prebuilt_so \
     vendor_lib64_libneuron_adapter_mgvi_so \
@@ -595,10 +590,13 @@ PRODUCT_PACKAGES += \
     vendor_lib64_libpqparamparser_so \
     vendor_lib64_libpqpconfig_so
 
+# NOTE: MTK prebuilt telephony/ims jars removed from boot jars on A17 -
+# their A14-era bytecode (MtkGsmMmiCode etc.) fails dex2oat verification
+# against A17 telephony. Kept as regular packages above for vendor users.
+# ims-base/ims-common back in boot: IMtkImsService Stub/Proxy/Default are
+# DEFINED in ims-base and ImsService has no usable uses-library wiring.
+# dex_bootjars verifies them - telephony-common stays OUT (MtkGsmMmiCode).
 PRODUCT_BOOT_JARS += \
     camerax-vendor-extensions \
     mediatek-ims-base \
-    mediatek-ims-common \
-    mediatek-telecom-common \
-    mediatek-telephony-base \
-    mediatek-telephony-common
+    mediatek-ims-common
